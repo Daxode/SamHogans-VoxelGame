@@ -49,15 +49,15 @@ public class TerrainModifier : MonoBehaviour
 
                 if(rightClick)//replace block with air
                 {
-                    inv.AddToInventory(tc.blocks[bix, biy, biz]);
-                    tc.blocks[bix, biy, biz] = BlockType.Air;
+                    inv.AddToInventory(tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)]);
+                    tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)] = BlockType.Air;
                     tc.BuildMesh();
                 }
                 else if(leftClick)
                 {
                     if(inv.CanPlaceCur())
                     {
-                        tc.blocks[bix, biy, biz] = inv.GetCurBlock();
+                        tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)] = inv.GetCurBlock();
 
                         tc.BuildMesh();
 

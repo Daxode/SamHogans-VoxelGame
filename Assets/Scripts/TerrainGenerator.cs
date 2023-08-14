@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class TerrainGenerator : MonoBehaviour
@@ -54,7 +55,7 @@ public class TerrainGenerator : MonoBehaviour
                 for(int y = 0; y < TerrainChunk.chunkHeight; y++)
                 {
                     //if(Mathf.PerlinNoise((xPos + x-1) * .1f, (zPos + z-1) * .1f) * 10 + y < TerrainChunk.chunkHeight * .5f)
-                    chunk.blocks[x, y, z] = GetBlockType(xPos+x-1, y, zPos+z-1);
+                    chunk.blocks[TerrainChunk.GetArrayIndex(x, y, z)] = GetBlockType(xPos+x-1, y, zPos+z-1);
                 }
 
 
@@ -209,7 +210,7 @@ public class TerrainGenerator : MonoBehaviour
     }
 
 
-    void GenerateTrees(BlockType[,,] blocks, int x, int z)
+    void GenerateTrees(NativeArray<BlockType> blocks, int x, int z)
     {
         System.Random rand = new System.Random(x * 10000 + z);
 
@@ -227,7 +228,7 @@ public class TerrainGenerator : MonoBehaviour
 
                 int y = TerrainChunk.chunkHeight - 1;
                 //find the ground
-                while(y > 0 && blocks[xPos, y, zPos] == BlockType.Air)
+                while(y > 0 && blocks[TerrainChunk.GetArrayIndex(xPos, y, zPos)] == BlockType.Air)
                 {
                     y--;
                 }
@@ -238,7 +239,7 @@ public class TerrainGenerator : MonoBehaviour
                 for(int j = 0; j < treeHeight; j++)
                 {
                     if(y+j < 64)
-                        blocks[xPos, y+j, zPos] = BlockType.Trunk;
+                        blocks[TerrainChunk.GetArrayIndex(xPos, y+j, zPos)] = BlockType.Trunk;
                 }
 
                 int leavesWidth = 1 + (int)(rand.NextDouble() * 6);
@@ -251,7 +252,7 @@ public class TerrainGenerator : MonoBehaviour
                         for(int l = zPos - (int)(leavesWidth * .5)+iter/2; l <= zPos + (int)(leavesWidth * .5)-iter/2; l++)
                         {
                             if(k >= 0 && k < 16 && l >= 0 && l < 16 && m >= 0 && m < 64 && rand.NextDouble() < .8f)
-                                blocks[k, m, l] = BlockType.Leaves;
+                                blocks[TerrainChunk.GetArrayIndex(k, m, l)] = BlockType.Leaves;
                         }
 
                     iter++;

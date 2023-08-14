@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class WaterChunk : MonoBehaviour
@@ -19,7 +20,7 @@ public class WaterChunk : MonoBehaviour
 
 
 
-    public void SetLocs(BlockType[,,] blocks)
+    public void SetLocs(NativeArray<BlockType> blocks)
     {
         int y;
 
@@ -34,7 +35,7 @@ public class WaterChunk : MonoBehaviour
                 y = TerrainChunk.chunkHeight - 1;
 
                 //find the ground
-                while(y > 0 && blocks[x+1, y, z+1] == BlockType.Air)
+                while(y > 0 && blocks[TerrainChunk.GetArrayIndex(x+1, y, z+1)] == BlockType.Air)
                 {
                     y--;
                 
