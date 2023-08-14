@@ -2,30 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TilePos
+public struct TilePos
 {
     int xPos, yPos;
 
-    Vector2[] uvs;
+    public Vector2 uv0 { get; private set; }
+    public Vector2 uv1 { get; private set; }
+    public Vector2 uv2 { get; private set; }
+    public Vector2 uv3 { get; private set; }
 
     public TilePos(int xPos, int yPos)
     {
         this.xPos = xPos;
         this.yPos = yPos;
-        uvs = new Vector2[]
-        {
-            new Vector2(xPos/16f + .001f, yPos/16f + .001f),
-            new Vector2(xPos/16f+ .001f, (yPos+1)/16f - .001f),
-            new Vector2((xPos+1)/16f - .001f, (yPos+1)/16f - .001f),
-            new Vector2((xPos+1)/16f - .001f, yPos/16f+ .001f),
-        };
+        uv0 = new Vector2(xPos / 16f + .001f, yPos / 16f + .001f);
+        uv1 = new Vector2(xPos / 16f + .001f, (yPos + 1) / 16f - .001f);
+        uv2 = new Vector2((xPos + 1) / 16f - .001f, (yPos + 1) / 16f - .001f);
+        uv3 = new Vector2((xPos + 1) / 16f - .001f, yPos / 16f + .001f);
     }
-
-    public Vector2[] GetUVs()
-    {
-        return uvs;
-    }
-
 
     public static Dictionary<Tile, TilePos> tiles = new Dictionary<Tile, TilePos>()
     {
