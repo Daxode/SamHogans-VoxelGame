@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class TerrainGenerator : MonoBehaviour
 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
 
-    FastNoise noise = new FastNoise();
+    static FastNoise noise = new FastNoise();
 
     int chunkDist = 5;
 
@@ -50,32 +51,36 @@ public class TerrainGenerator : MonoBehaviour
         }
         
 
-        for(int x = 0; x < TerrainChunk.chunkWidth+2; x++)
-            for(int z = 0; z < TerrainChunk.chunkWidth+2; z++)
-                for(int y = 0; y < TerrainChunk.chunkHeight; y++)
-                {
-                    //if(Mathf.PerlinNoise((xPos + x-1) * .1f, (zPos + z-1) * .1f) * 10 + y < TerrainChunk.chunkHeight * .5f)
-                    chunk.blocks[TerrainChunk.GetArrayIndex(x, y, z)] = GetBlockType(xPos+x-1, y, zPos+z-1);
-                }
-
-
-        GenerateTrees(chunk.blocks, xPos, zPos);
+        SetBlocks(chunk.blocks, xPos, zPos);
 
         chunk.BuildMesh();
-
-
+        
         WaterChunk wat = chunk.transform.GetComponentInChildren<WaterChunk>();
         wat.SetLocs(chunk.blocks);
         wat.BuildMesh();
-        
-
 
         chunks.Add(new ChunkPos(xPos, zPos), chunk);
     }
 
+    static void SetBlocks(NativeArray<BlockType> blocks, int xPos, int zPos)
+    {
+        SetTerrainBlocks(blocks, xPos, zPos);
+        GenerateTrees(blocks, xPos, zPos);
+    }
+    
+    static void SetTerrainBlocks(NativeArray<BlockType> blocks, int xPos, int zPos)
+    {
+        for (int x = 0; x < TerrainChunk.chunkWidth + 2; x++)
+        for (int z = 0; z < TerrainChunk.chunkWidth + 2; z++)
+        for (int y = 0; y < TerrainChunk.chunkHeight; y++)
+        {
+            //if(Mathf.PerlinNoise((xPos + x-1) * .1f, (zPos + z-1) * .1f) * 10 + y < TerrainChunk.chunkHeight * .5f)
+            blocks[TerrainChunk.GetArrayIndex(x, y, z)] = GetBlockType(xPos + x - 1, y, zPos + z - 1);
+        }
+    }
 
     //get the block type at a specific coordinate
-    BlockType GetBlockType(int x, int y, int z)
+    static BlockType GetBlockType(int x, int y, int z)
     {
         /*if(y < 33)
             return BlockType.Dirt;
@@ -210,7 +215,7 @@ public class TerrainGenerator : MonoBehaviour
     }
 
 
-    void GenerateTrees(NativeArray<BlockType> blocks, int x, int z)
+    static void GenerateTrees(NativeArray<BlockType> blocks, int x, int z)
     {
         System.Random rand = new System.Random(x * 10000 + z);
 
