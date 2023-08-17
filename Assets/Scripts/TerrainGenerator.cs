@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class TerrainGenerator : MonoBehaviour
@@ -11,8 +13,6 @@ public class TerrainGenerator : MonoBehaviour
     public Transform player;
 
     public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
-
-    static FastNoise noise = new FastNoise();
 
     int chunkDist = 5;
 
@@ -97,9 +97,9 @@ public class TerrainGenerator : MonoBehaviour
         
 
 
-        //print(noise.GetSimplex(x, z));
-        float simplex1 = noise.GetSimplex(x*.8f, z*.8f)*10;
-        float simplex2 = noise.GetSimplex(x * 3f, z * 3f) * 10*(noise.GetSimplex(x*.3f, z*.3f)+.5f);
+        //print(noise.snoise(new float2(x, z));
+        float simplex1 = noise.snoise(new float2(x*.8f, z*.8f))*10;
+        float simplex2 = noise.snoise(new float2(x * 3f, z * 3f)) * 10*(noise.snoise(new float2(x*.3f, z*.3f))+.5f);
 
         float heightMap = simplex1 + simplex2;
 
@@ -107,19 +107,19 @@ public class TerrainGenerator : MonoBehaviour
         float baseLandHeight = TerrainChunk.chunkHeight * .5f + heightMap;
 
         //3d noise for caves and overhangs and such
-        float caveNoise1 = noise.GetPerlinFractal(x*5f, y*10f, z*5f);
-        float caveMask = noise.GetSimplex(x * .3f, z * .3f)+.3f;
+        float caveNoise1 = noise.cnoise(new float3(x*5f, y*10f, z*5f));
+        float caveMask = noise.snoise(new float2(x * .3f, z * .3f)+.3f);
 
         //stone layer heightmap
-        float simplexStone1 = noise.GetSimplex(x * 1f, z * 1f) * 10;
-        float simplexStone2 = (noise.GetSimplex(x * 5f, z * 5f)+.5f) * 20 * (noise.GetSimplex(x * .3f, z * .3f) + .5f);
+        float simplexStone1 = noise.snoise(new float2(x * 1f, z * 1f) * 10);
+        float simplexStone2 = (noise.snoise(new float2(x * 5f, z * 5f))+.5f) * 20 * (noise.snoise(new float2(x * .3f, z * .3f)) + .5f);
 
         float stoneHeightMap = simplexStone1 + simplexStone2;
         float baseStoneHeight = TerrainChunk.chunkHeight * .25f + stoneHeightMap;
 
 
-        //float cliffThing = noise.GetSimplex(x * 1f, z * 1f, y) * 10;
-        //float cliffThingMask = noise.GetSimplex(x * .4f, z * .4f) + .3f;
+        //float cliffThing = noise.snoise(new float2(x * 1f, z * 1f, y) * 10;
+        //float cliffThingMask = noise.snoise(new float2(x * .4f, z * .4f) + .3f;
 
 
 
@@ -145,7 +145,7 @@ public class TerrainGenerator : MonoBehaviour
         /*if(blockType != BlockType.Air)
             blockType = BlockType.Stone;*/
 
-        //if(blockType == BlockType.Air && noise.GetSimplex(x * 4f, y * 4f, z*4f) < 0)
+        //if(blockType == BlockType.Air && noise.snoise(new float2(x * 4f, y * 4f, z*4f) < 0)
           //  blockType = BlockType.Dirt;
 
         //if(Mathf.PerlinNoise(x * .1f, z * .1f) * 10 + y < TerrainChunk.chunkHeight * .5f)
@@ -224,9 +224,8 @@ public class TerrainGenerator : MonoBehaviour
 
     static void GenerateTrees(NativeArray<BlockType> blocks, int x, int z)
     {
-        System.Random rand = new System.Random(x * 10000 + z);
-
-        float simplex = noise.GetSimplex(x * .8f, z * .8f);
+        float simplex = noise.snoise(new float2(x * .8f, z * .8f));
+        var rand = Unity.Mathematics.Random.CreateFromIndex((uint)(x * 10000 + z));
 
         if(simplex > 0)
         {
@@ -237,7 +236,7 @@ public class TerrainGenerator : MonoBehaviour
             {
                 int xPos = (int)(rand.NextDouble() * 14) + 1;
                 int zPos = (int)(rand.NextDouble() * 14) + 1;
-
+                
                 int y = TerrainChunk.chunkHeight - 1;
                 //find the ground
                 while(y > 0 && blocks[TerrainChunk.GetArrayIndex(xPos, y, zPos)] == BlockType.Air)
