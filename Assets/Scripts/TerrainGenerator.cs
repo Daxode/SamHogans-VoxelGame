@@ -61,7 +61,7 @@ public class TerrainGenerator : MonoBehaviour
 
         chunks.Add(new ChunkPos(xPos, zPos), chunk);
     }
-
+    
     static void SetBlocks(NativeArray<BlockType> blocks, int xPos, int zPos)
     {
         SetTerrainBlocks(blocks, xPos, zPos);

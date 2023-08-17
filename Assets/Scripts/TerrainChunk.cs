@@ -28,7 +28,11 @@ public class TerrainChunk : MonoBehaviour
     {
         Mesh mesh = new Mesh();
         
-        AllocateMeshData(blocks, out var verts, out var tris, out var uvs);
+        var verts = new NativeList<Vector3>(Allocator.Temp);
+        var tris = new NativeList<int>(Allocator.Temp);
+        var uvs = new NativeList<Vector2>(Allocator.Temp);
+        
+        FillMeshData(blocks, verts, tris, uvs);
 
         mesh.SetVertices(verts.AsArray());
         mesh.SetUVs(0, uvs.AsArray());
@@ -44,12 +48,8 @@ public class TerrainChunk : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
     
-    static void AllocateMeshData(NativeArray<BlockType> blocks, out NativeList<Vector3> verts, out NativeList<int> tris, out NativeList<Vector2> uvs)
+    static void FillMeshData(NativeArray<BlockType> blocks, NativeList<Vector3> verts, NativeList<int> tris, NativeList<Vector2> uvs)
     {
-        verts = new NativeList<Vector3>(Allocator.Temp);
-        tris = new NativeList<int>(Allocator.Temp);
-        uvs = new NativeList<Vector2>(Allocator.Temp);
-
         for (int x = 1; x < chunkWidth + 1; x++)
         for (int z = 1; z < chunkWidth + 1; z++)
         for (int y = 0; y < chunkHeight; y++)
