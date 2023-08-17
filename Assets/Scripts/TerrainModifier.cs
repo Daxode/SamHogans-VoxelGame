@@ -51,7 +51,7 @@ public class TerrainModifier : MonoBehaviour
                 {
                     inv.AddToInventory(tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)]);
                     tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)] = BlockType.Air;
-                    tc.BuildMesh();
+                    tc.BuildMesh(default);
                 }
                 else if(leftClick)
                 {
@@ -59,7 +59,7 @@ public class TerrainModifier : MonoBehaviour
                     {
                         tc.blocks[TerrainChunk.GetArrayIndex(bix, biy, biz)] = inv.GetCurBlock();
 
-                        tc.BuildMesh();
+                        tc.BuildMesh(default);
 
                         inv.ReduceCur();
                     }

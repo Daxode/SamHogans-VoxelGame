@@ -51,9 +51,9 @@ public class TerrainGenerator : MonoBehaviour
         }
         
 
-        SetBlocks(chunk.blocks, xPos, zPos);
-
-        chunk.BuildMesh();
+        var setBlocksJob = new SetBlocksJob {blocks = chunk.blocks, xPos=xPos, zPos=zPos};
+        var setBlocksJobHandle = setBlocksJob.Schedule();
+        chunk.BuildMesh(setBlocksJobHandle);
         
         WaterChunk wat = chunk.transform.GetComponentInChildren<WaterChunk>();
         wat.SetLocs(chunk.blocks);
@@ -61,13 +61,20 @@ public class TerrainGenerator : MonoBehaviour
 
         chunks.Add(new ChunkPos(xPos, zPos), chunk);
     }
-    
-    static void SetBlocks(NativeArray<BlockType> blocks, int xPos, int zPos)
+
+    [BurstCompile]
+    struct SetBlocksJob : IJob
     {
-        SetTerrainBlocks(blocks, xPos, zPos);
-        GenerateTrees(blocks, xPos, zPos);
+        public NativeArray<BlockType> blocks;
+        public int xPos;
+        public int zPos;
+
+        public void Execute() {
+            SetTerrainBlocks(blocks, xPos, zPos);
+            GenerateTrees(blocks, xPos, zPos);
+        }
     }
-    
+
     static void SetTerrainBlocks(NativeArray<BlockType> blocks, int xPos, int zPos)
     {
         for (int x = 0; x < TerrainChunk.chunkWidth + 2; x++)
