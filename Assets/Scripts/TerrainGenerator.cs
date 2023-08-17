@@ -98,8 +98,8 @@ public class TerrainGenerator : MonoBehaviour
 
 
         //print(noise.snoise(new float2(x, z));
-        float simplex1 = noise.snoise(new float2(x*.8f, z*.8f))*10;
-        float simplex2 = noise.snoise(new float2(x * 3f, z * 3f)) * 10*(noise.snoise(new float2(x*.3f, z*.3f))+.5f);
+        float simplex1 = noise.snoise(new float2(x*.8f, z*.8f))*2f;
+        float simplex2 = noise.snoise(new float2(x * 3f, z * 3f)) * 2f*(noise.snoise(new float2(x*.3f, z*.3f))+.5f);
 
         float heightMap = simplex1 + simplex2;
 
@@ -107,12 +107,12 @@ public class TerrainGenerator : MonoBehaviour
         float baseLandHeight = TerrainChunk.chunkHeight * .5f + heightMap;
 
         //3d noise for caves and overhangs and such
-        float caveNoise1 = noise.cnoise(new float3(x*5f, y*10f, z*5f));
-        float caveMask = noise.snoise(new float2(x * .3f, z * .3f)+.3f);
+        float caveNoise1 = noise.cnoise(new float3(x*5f, y*2f, z*5f));
+        float caveMask = noise.snoise(new float2(x * .3f, z * .3f))+.3f;
 
         //stone layer heightmap
-        float simplexStone1 = noise.snoise(new float2(x * 1f, z * 1f) * 10);
-        float simplexStone2 = (noise.snoise(new float2(x * 5f, z * 5f))+.5f) * 20 * (noise.snoise(new float2(x * .3f, z * .3f)) + .5f);
+        float simplexStone1 = noise.snoise(new float2(x * 1f, z * 1f)) * 2;
+        float simplexStone2 = (noise.snoise(new float2(x * 5f, z * 5f))+.5f) * 4 * (noise.snoise(new float2(x * .3f, z * .3f)) + .5f);
 
         float stoneHeightMap = simplexStone1 + simplexStone2;
         float baseStoneHeight = TerrainChunk.chunkHeight * .25f + stoneHeightMap;
